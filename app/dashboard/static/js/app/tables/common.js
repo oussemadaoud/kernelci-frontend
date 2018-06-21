@@ -174,8 +174,7 @@ define([
         var successNode;
         var totalNode;
         var unknownNode;
-
-        if (settings.type === 'display') {
+		if (settings.type === 'display') {
             divNode = document.createElement('div');
 
             totalNode = _countBadge(
@@ -319,7 +318,7 @@ define([
             rendered = status;
         }
 
-        return rendered;
+        return rendered; 
     };
 
     /**
