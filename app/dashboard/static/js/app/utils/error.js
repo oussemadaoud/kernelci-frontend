@@ -30,7 +30,7 @@ define([
         return 'error-' + (Math.random() * ((code + 100) - code) + code);
     }
 
-    function createErrorDiv(code, message) {
+    function createErrorDiv(code, response) {
         var buttonNode,
             divNode;
 
@@ -47,8 +47,10 @@ define([
 
         divNode.appendChild(buttonNode);
 
-        if (message !== '' && message !== undefined && message !== null) {
-            divNode.insertAdjacentHTML('beforeend', message);
+        if ($.isPlainObject( response ) && response.reason ) {
+            divNode.insertAdjacentHTML('beforeend', 'Error [ '+ code +' ] : '+ response.reason);
+        } else if (response !== '' && response !== undefined && response !== null) {
+            divNode.insertAdjacentHTML('beforeend', response);
         } else {
             divNode.appendChild(
                 document.createTextNode(
@@ -64,19 +66,19 @@ define([
         return divNode;
     }
 
-    function createError(code) {
+    function createError(code , response ) {
         var divNode,
             errorElement;
 
         errorElement = document.getElementById('errors-container');
-        divNode = createErrorDiv(code);
+        divNode = createErrorDiv(code , response );
         errorElement.appendChild(divNode);
 
         $('#' + divNode.id).alert();
     }
 
     err.error = function(response) {
-        createError(response.status);
+        createError(response.status , response.responseJSON );
     };
 
     err.customError = function(code, message) {
@@ -84,7 +86,7 @@ define([
             errorElement;
 
         errorElement = document.getElementById('errors-container');
-        divNode = createErrorDiv(code, message);
+        divNode = createErrorDiv(code, { code : code , reason : message } );
         errorElement.appendChild(divNode);
 
         $('#' + divNode.id).alert();
