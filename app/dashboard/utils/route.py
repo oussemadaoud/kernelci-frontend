@@ -379,24 +379,18 @@ def init():
 
     add_rule(
         "/test/board/<string:board>/job/<string:job>/kernel/<string:kernel>/",
-        view_func=vtest.TestsBoardJobKernelView.
-        as_view("tests-board-job-kernel-view"),
+        view_func=vtest.TestsBoardJobKernelView.as_view("tests-board-job-kernel-view"),
         methods=["GET"]
     )
 
     add_rule(
-        "/release/kernel/59c4d64a49d4f1cac41290e3/",
+        "/release/kernel/<string:kernel>/",
         view_func=vrelease.ReleasesKernelView.as_view("release-kernel"),
         methods=["GET"]
     )
 
-    add_rule(
-        "/release/kernel/59c4d64a49d4f1cac41290e3/board/test/",
-        view_func=vrelease.ReleasesKernelBoardView.as_view("release-kernel-board"),
-        methods=["GET"]
-    )
+
     
-    #release views.
     add_rule(
         "/release/",
         view_func=vrelease.ReleasesAllView.as_view("release-all-view"),

@@ -52,7 +52,9 @@ class ReleasesAllView(ReleaseGenericView):
         )
 class ReleasesKernelView(ReleaseGenericView):
 
-    def dispatch_request(self):
+    def dispatch_request(self, **kwargs):
+        kernel = kwargs["kernel"]
+
         body_title = "Releases Kernel Reports"
         search_filter, page_len = get_search_parameters(request)
 
@@ -68,8 +70,12 @@ class ReleasesKernelView(ReleaseGenericView):
 
 class ReleasesKernelBoardView(ReleaseGenericView):
 
-    def dispatch_request(self):
+    def dispatch_request(self, **kwargs):
+        kernel = kwargs["kernel"]
+        board  = kwargs["board"]
+
         body_title = "Releases Kernel Boards Reports"
+
         search_filter, page_len = get_search_parameters(request)
 
         return render_template(
