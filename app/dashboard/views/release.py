@@ -38,7 +38,7 @@ class ReleaseGenericView(View):
 class ReleasesAllView(ReleaseGenericView):
 
     def dispatch_request(self):
-        body_title = "Available Releases Reports"
+        body_title = "Releases Report"
         search_filter, page_len = get_search_parameters(request)
 
         return render_template(
@@ -55,12 +55,12 @@ class ReleasesKernelView(ReleaseGenericView):
     def dispatch_request(self, **kwargs):
         kernel = kwargs["kernel"]
 
-        body_title = "Releases Kernel Reports"
+        body_title = "Release Boards Report"
         search_filter, page_len = get_search_parameters(request)
 
         return render_template(
             "base-all.html",
-            table_id="tests-table",
+            table_id="release-table",
             data_main="kci-releases-kernel",
             body_title=body_title,
             page_len=page_len,
@@ -74,13 +74,13 @@ class ReleasesKernelBoardView(ReleaseGenericView):
         kernel = kwargs["kernel"]
         board  = kwargs["board"]
 
-        body_title = "Releases Kernel Boards Reports"
+        body_title = "Release Board Cases Report"
 
         search_filter, page_len = get_search_parameters(request)
 
         return render_template(
             "base-all.html",
-            table_id="tests-table",
+            table_id="release-table",
             data_main="kci-releases-kernel-board",
             body_title=body_title,
             page_len=page_len,

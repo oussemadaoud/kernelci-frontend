@@ -389,7 +389,11 @@ def init():
         methods=["GET"]
     )
 
-
+    add_rule(
+        "/release/kernel/<string:kernel>/board/<string:board>/",
+        view_func=vrelease.ReleasesKernelBoardView.as_view("release-kernel-board"),
+        methods=["GET"]
+    )
     
     add_rule(
         "/release/",

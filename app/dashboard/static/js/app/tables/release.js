@@ -63,6 +63,21 @@ define([
 	gTestTable.renderRate = function(date, type , data) {
 		return $('<div id="rate-'+ data._id.$oid +'"></div>').html('loading...')[0].outerHTML
 	};
+
+    gTestTable.renderMeasurement = function(value, type , data) {
+        if ( data.measurements.length )
+            return data.measurements[ 0 ][ 'value' ];
+    };
+
+    gTestTable.renderUnit = function(value, type , data) {
+
+        if(!value){
+            console.data( data )
+        }
+
+        if ( data.measurements.length )
+            return data.measurements[ 0 ][ 'unit' ];
+    };
 		
     gTestTable.renderDate = function(date, type) {
         return tcommon.renderDate(date, type);

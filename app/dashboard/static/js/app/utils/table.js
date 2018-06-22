@@ -18,10 +18,11 @@
  */
 define([
     'jquery',
+    'utils/html',
     'sprintf',
     'datatables.net',
     'datatables.bootstrap'
-], function($) {
+], function($ , html) {
     'use strict';
     var gMenuFmt,
         gSearchLanguage,
@@ -41,6 +42,9 @@ define([
         '<i class="fa fa-search"></i></span>_INPUT_</div>';
 
     gMenuFmt = '_MENU_&nbsp;<strong>%s</strong>';
+
+
+
 
     /**
      * Remove the focus from the element that triggers the event.
@@ -83,6 +87,10 @@ define([
             '_MENU_&nbsp;<strong>reports per page</strong>',
         _languageZeroRecords: '<strong>No data found.</strong>'
     };
+
+
+
+
 
     kciTable.settings = function() {
         return {
@@ -427,6 +435,15 @@ define([
 
         return newTable.setup();
     };
+
+    /**
+     */
+    gTable.loadingError = function() {
+        html.removeElement(document.getElementById('table-loading'));
+        html.replaceContent(
+            document.getElementById('table-div'),
+            html.errorDiv('Error loading data.'));
+    }
 
     return gTable;
 });

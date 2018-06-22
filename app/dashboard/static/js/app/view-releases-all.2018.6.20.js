@@ -15,13 +15,23 @@ require([
     var gBoard;
     var gPageLen;
     var gSearchFilter;
-    var gJobsTable;
     var gTableCount;
     var gBatchCountMissing;
 	
-	var gTableBuild;
-	console.log('testing');
-    document.getElementById('li-release').setAttribute('class', 'active');
+	var page = 'release';
+
+    var [ gDateRange , gSearchFilter , gPageLen ] = init.init( page );
+
+    if (document.getElementById('board') !== null) {
+        gBoard = document.getElementById('board').value;
+    }
+
+    var gJobsTable = table({
+        tableId: 'releases-table',
+        tableDivId: 'releases-table-div',
+        tableLoadingDivId: 'table-loading'
+    });
+
 
     gDateRange = appconst.MAX_DATE_RANGE;
     gPageLen = null;
@@ -30,7 +40,6 @@ require([
     gBatchCountMissing = {};
 
 	function _createOp( batchOps , result) {
-		//console.log(result)
 		var suiteId = result._id.$oid;
 		var suiteBranch = result.git_branch;
 		//suiteQuery = 'board=' + gBoard + '&git_branch=' + suiteBranch;
@@ -121,8 +130,6 @@ require([
     function getBatchCountDone(response) {
         var results;
 		
-		
-		//console.log( response )
 		var id       = response.result[1].operation_id.split('cases-total-count-')[1]
 		var ctotal   = response.result[1].result[ 0 ].count
 		var csuccess = response.result[2].result[ 0 ].count
@@ -159,65 +166,8 @@ require([
         }
     }
 
-    function getBatchCount(response) {
-        var batchOps;
-        var deferred;
-        var suiteId;
-        var suiteTree;
-        var suiteBranch;
-        var suiteQuery;
-        var queryStr;
-        var queryData;
-        var results;
-
-        
-
-        function _getTestSuiteDone(resultz) {
-            results = resultz.result;
-
-            if (results.length > 0) {
-                batchOps = [];
-                // Only one result, latest test suite
-                _createOp(results[0]);
-                deferred = request.post(
-                    '/_ajax/batch', JSON.stringify({batch: batchOps}));
-
-                $.when(deferred)
-                    .fail(error.error, getBatchCountFail)
-                    .done(getBatchCountDone);
-            }
-        }
-
-       /*  function _getTestSuite(result) {
-            // Query parameters to get the latest test suite
-            queryData = {
-                board: result.board,
-                job: result.job,
-                git_branch: result.git_branch,
-                sort: 'created_on',
-                sort_order: '-1',
-                limit: '1'
-            }
-
-            // Get the latest test suite
-            deferred = request.get('/_ajax/test/suite', queryData);
-            $.when(deferred)
-                .done(_getTestSuiteDone)
-                .fail(function() {
-                    document.getElementById('suites-count-'+ result.job)
-                        .innerHTML ='&infin;';
-                    ttest.getCountFail(result.job)
-                });
-        }
-
-        results = response.result;
-        if (results.length > 0) {
-            results.forEach(_getTestSuite);
-        } */
-    }
-
     function getJobsFail() {
-        html.removeElement(document.getElementById('jobs-table-loading'));
+        html.removeElement(document.getElementById('table-loading'));
         html.replaceContent(
             document.getElementById('jobs-table-div'),
             html.errorDiv('Error loading data.'));
@@ -265,12 +215,7 @@ require([
 			var batchOps = []
 			_createOp( batchOps , data )
 			
-			//console.log( batchOps )
-			
 			var deferred = request.post( '/_ajax/batch', JSON.stringify( { batch: batchOps } ) );
-			
-			
-			
 			$.when(deferred)
 				.fail(error.error, getBatchCountFail)
 				.done(getBatchCountDone);
@@ -284,18 +229,8 @@ require([
         }
 
         // Internal wrapper to provide the href.
-        function _renderTree(data, type) {
-			console.log('>>>_renderTree');
-            console.log(data);
-            return ttest.renderTree(
-                data, type, '/releases/results/' + type + '/job/' + data + '/');
-        }
-
-        // Internal wrapper to provide the href.
         function _renderDetails(href, type, data) {
-			console.log('>>>_renderDetails');
-            console.log(data);
-            return ttest.renderDetails(
+			return ttest.renderDetails(
                 '/release/kernel/' + data._id.$oid + '/' , type);
         }
 		
@@ -305,7 +240,6 @@ require([
 				title: 'Build Type',
 				type: 'string',
 				className: 'tree-column',
-				/* render: _renderTree */
 			},
 			{
 				data: 'git_branch',
@@ -318,7 +252,6 @@ require([
 				title: 'Version',
 				type: 'string',
 				className: 'test-suite-column',
-				//render: _renderSuitesCount
 			},
 
 			{
@@ -357,9 +290,9 @@ require([
 			.data(results)
 			.columns(columns)
 			.order([3, 'desc'])
-			.rowURL('/test/board/' + gBoard + '/job/%(job)s/')
-			.rowURLElements(['job'])
-			.languageLengthMenu('trees per page')
+			.rowURL('/release/kernel/%(kernel)s')
+			.rowURLElements(['kernel'])
+			.languageLengthMenu('releases per page')
 			.draw()
                
 
@@ -371,32 +304,7 @@ require([
     function getJobsDone(response) {
         var results;
 
-        // Internal wrapper to provide the href.
-		
-        function _renderSuitesCount(data, type) {
-            var rendered;
-
-            rendered = null;
-            if (type === 'display') {
-                rendered = ttest.countBadge({
-                    data: data,
-                    type: 'default',
-                    idStart: 'suites-',
-                    extraClasses: ['suites-count-badge']
-                });
-            } else if (type === 'sort') {
-                if (gTableCount.hasOwnProperty('suites-count-' + data)) {
-                    rendered = gTableCount['suites-count-' + data];
-                } else {
-                    rendered = NaN;
-                }
-            }
-
-            return rendered;
-        }
-		
-		
-		results = response.result;
+        results = response.result;
         if (results.length > 0) {			 
 			var batchOps = []
 			
@@ -404,7 +312,6 @@ require([
 			
 			
 			results.forEach( function( kernel , i ){
-				// console.log(kernel);
 				batchOps.push({
 					method: 'GET',
 					operation_id: 'kernel-' + kernel,
@@ -421,23 +328,18 @@ require([
 				.done(getDataDone);
 			
         } else {
-            html.removeElement(document.getElementById('releases-table-loading'));
+            html.removeElement(document.getElementById('table-loading'));
             html.replaceContent(
                 document.getElementById('releases-table-div'),
                 html.errorDiv('No data found.'));
         }
     }
 	
-	function getDataDone( response ){
-		
-		//console.log( response )
-		
-		
+	function getDataDone( response )
+    {
 		response.result = [ response.result[0] ]
 		
-		/* response.result */
-		
-		var store = []			
+		var store = []
 		var stub = function ( items ) {
 			var buildTypes = [ 'Release' , 'Commit' , 'Snapshot' , 'buildTypes3' , 'buildTypes4' , 'buildTypes5' , 'buildTypes6' , 'TYTY' ]
 			var ii = 0
@@ -445,10 +347,7 @@ require([
 			var current = items[ 0 ]
 			current.build_type = buildTypes[ii++]
 			
-			
-			//console.log( items.length )
-			
-			for( var i = 1 , t = items.length ; i < t ; i++ ) {			
+			for( var i = 1 , t = items.length ; i < t ; i++ ) {
 				if ( current.kernel == items[ i ].kernel && current.git_branch == items[ i ].git_branch ) {
 					items[ i ].build_type = buildTypes[ii++]
 				} else {
@@ -463,16 +362,11 @@ require([
 		response.result.forEach( function ( kernelItems ) {
 			stub( kernelItems.result[0].result )
 		} )
-		
-		//console.log( store )
-		
+
+        html.removeElement(document.getElementById('table-loading'));
 		buildTable(store);
 		
     }
-	
-	function getDataFail( result ) {
-	
-	}
 
     function getJobs() {
         var deferred;
@@ -493,48 +387,26 @@ require([
 
         $.when(deferred)
             .fail(error.error, getJobsFail)
-            .done(getJobsDone, getBatchCount);
+            .done(getJobsDone);
     }
 	
-	function getData(kernel) {
-        var deferred;
-	
-        deferred = request.get(
-			'/_ajax/test/suite?kernel=' + kernel,
-            {
-                aggregate: 'kernel',
-                date_range: gDateRange,
-                field: [
-                    'job', 'git_branch', 'created_on', 'kernel', 'name'
-                ],
-                sort: 'created_on',
-                sort_order: -1
-            }
-        );
-		return deferred;
-    }
+    // function getData(kernel) {
+    //     var deferred;
+    //
+    //     deferred = request.get(
+		// 	'/_ajax/test/suite?kernel=' + kernel,
+    //         {
+    //             aggregate: 'kernel',
+    //             date_range: gDateRange,
+    //             field: [
+    //                 'job', 'git_branch', 'created_on', 'kernel', 'name'
+    //             ],
+    //             sort: 'created_on',
+    //             sort_order: -1
+    //         }
+    //     );
+		// return deferred;
+    // }
 
-    if (document.getElementById('date-range') !== null) {
-        gDateRange = document.getElementById('date-range').value;
-    }
-    if (document.getElementById('board') !== null) {
-        gBoard = document.getElementById('board').value;
-    }
-    if (document.getElementById('page-len') !== null) {
-        gPageLen = document.getElementById('page-len').value;
-    }
-    if (document.getElementById('search-filter') !== null) {
-        gSearchFilter = document.getElementById('search-filter').value;
-    }
-	//console.log('0')
-		gJobsTable = table({
-			tableId: 'releases-table',
-			tableDivId: 'releases-table-div',
-			tableLoadingDivId: 'releases-table-loading'
-		});	
-
-        getJobs();
-
-    init.hotkeys();
-    init.tooltip();
+    getJobs();
 });
