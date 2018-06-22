@@ -64,6 +64,10 @@ define([
      */
     request.batch = function( batchOps , success , fail ) {
         this.backend( 'post' , 'batch' , JSON.stringify( { batch: batchOps } ) , success , fail )
+        // var deferred = request[ 'post' ]( '/_ajax/batch/' , JSON.stringify( { batch: batchOps } ) );
+        // $.when(deferred)
+        //     .fail( error.error,  fail )
+        //     .done( success );
     }
 
     /**
