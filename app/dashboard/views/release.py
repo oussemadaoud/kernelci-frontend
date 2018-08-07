@@ -38,7 +38,7 @@ class ReleaseGenericView(View):
 class ReleasesAllView(ReleaseGenericView):
 
     def dispatch_request(self):
-        body_title = "Releases Report"
+        body_title = "Tests by build Report"
         search_filter, page_len = get_search_parameters(request)
 
         return render_template(
@@ -55,7 +55,7 @@ class ReleasesKernelView(ReleaseGenericView):
     def dispatch_request(self, **kwargs):
         kernel = kwargs["kernel"]
 
-        body_title = "Release Boards Report"
+        body_title = "Test suites by board for Version &#171;"+kernel+"&#187;"
         search_filter, page_len = get_search_parameters(request)
 
         return render_template(
@@ -74,7 +74,7 @@ class ReleasesKernelBoardView(ReleaseGenericView):
         kernel = kwargs["kernel"]
         board  = kwargs["board"]
 
-        body_title = "Release Board Cases Report"
+        body_title = "All Test Cases for Version &#171;<span rel='tooltip' data-toggle='tooltip' title='' data-original-title='Go back to "+kernel+" kernel'><a href='/test-build/kernel/"+kernel+"/'>"+kernel+"</a></span>&#187; for board &#171;"+board+"&#187;"
 
         search_filter, page_len = get_search_parameters(request)
 
@@ -82,6 +82,72 @@ class ReleasesKernelBoardView(ReleaseGenericView):
             "base-all.html",
             table_id="release-table",
             data_main="kci-releases-kernel-board",
+            body_title=body_title,
+            page_len=page_len,
+            page_title=self.TESTS_PAGE_TITLE,
+            search_filter=search_filter
+        )
+        
+class ReleasesKernelBoardSuiteNameView(ReleaseGenericView):
+
+    def dispatch_request(self, **kwargs):
+        kernel = kwargs["kernel"]
+        board  = kwargs["board"]
+        suite_name = kwargs["suite_name"]
+
+        body_title = "Test sets for Version &#171;<span rel='tooltip' data-toggle='tooltip' title='' data-original-title='Go back to "+kernel+" kernel'><a href='/test-build/kernel/"+kernel+"/'>"+kernel+"</a></span>&#187; for board &#171;"+board+"&#187; on test suite name &#171;"+suite_name+"&#187;"
+
+        search_filter, page_len = get_search_parameters(request)
+
+        return render_template(
+            "base-all.html",
+            table_id="release-table",
+            data_main="kci-releases-kernel-board-suite-name",
+            body_title=body_title,
+            page_len=page_len,
+            page_title=self.TESTS_PAGE_TITLE,
+            search_filter=search_filter
+        )
+        
+class ReleasesKernelBoardSetNameView(ReleaseGenericView):
+
+    def dispatch_request(self, **kwargs):
+        kernel = kwargs["kernel"]
+        board  = kwargs["board"]
+        suite_name = kwargs["suite_name"]
+        set_name = kwargs["set_name"]
+
+        body_title = "Test cases for Version &#171;<span rel='tooltip' data-toggle='tooltip' title='' data-original-title='Go back to "+kernel+" kernel'><a href='/test-build/kernel/"+kernel+"/'>"+kernel+"</a></span>&#187;"
+
+        search_filter, page_len = get_search_parameters(request)
+
+        return render_template(
+            "base-all.html",
+            table_id="release-table",
+            data_main="kci-releases-kernel-board-set-name",
+            body_title=body_title,
+            page_len=page_len,
+            page_title=self.TESTS_PAGE_TITLE,
+            search_filter=search_filter
+        )
+        
+class ReleasesKernelBoardCaseNameView(ReleaseGenericView):
+
+    def dispatch_request(self, **kwargs):
+        kernel = kwargs["kernel"]
+        board  = kwargs["board"]
+        suite_name = kwargs["suite_name"]
+        set_name = kwargs["set_name"]
+        case_name = kwargs["case_name"]
+
+        body_title = "Release details for Version &#171;"+kernel+"&#187;"
+
+        search_filter, page_len = get_search_parameters(request)
+
+        return render_template(
+            "base-all.html",
+            table_id="release-table",
+            data_main="kci-releases-kernel-board-case-name",
             body_title=body_title,
             page_len=page_len,
             page_title=self.TESTS_PAGE_TITLE,

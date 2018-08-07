@@ -275,6 +275,7 @@ define([
             } else {
                 created = new Date(date.$date);
                 rendered = created.toCustomISODate();
+				//rendered = created.toCustomISODateTime();
             }
         } else {
             rendered = date;
@@ -285,6 +286,8 @@ define([
         }
 
         return rendered;
+		//created = new Date(date.$date);
+		//return created.getUTCFullYear()+'-'+created.getUTCMonth()+'-'+created.getUTCDay()+' '+created.getUTCHours()+':'+created.getUTCMinutes()+':'+created.getUTCSeconds();
     };
 
     gTablesUtils.statusNode = function(status, defaults) {
@@ -342,9 +345,12 @@ define([
             } else {
                 tooltipNode.setAttribute('title', 'More info');
             }
-
-            aNode = document.createElement('a');
-            aNode.setAttribute('href', href);
+            if(href!='null'){                
+                aNode = document.createElement('a');
+                aNode.setAttribute('href', href);
+            }else{
+                aNode = document.createElement('span');
+            }
 
             aNode.appendChild(html.search());
             tooltipNode.appendChild(aNode);
@@ -355,6 +361,36 @@ define([
             tooltipNode.remove();
         }
 
+        return rendered;
+    };
+	/**
+     * Render the details column on a table.
+     *
+     * @param {String} href: The link location.
+     * @param {String} type: The type of the display option.
+     * @param {String} title: The title for the tooltip.
+    **/
+    gTablesUtils.renderGitUrl = function(href, type, data) {
+        var aNode;
+        var rendered;
+        var tooltipNode;
+
+        rendered = null;
+        if (type === 'display') {
+            tooltipNode = html.tooltip();
+			if(href){
+				tooltipNode.setAttribute('title', 'Go to git repository');
+				aNode = document.createElement('a');
+				aNode.setAttribute('href', href);
+				aNode.setAttribute('target', '_blank');
+				aNode.appendChild(document.createTextNode(data));
+				tooltipNode.appendChild(aNode);
+			}else{
+				tooltipNode.appendChild(document.createTextNode(data));
+			}
+
+            rendered = tooltipNode.outerHTML;
+        }
         return rendered;
     };
 
@@ -375,6 +411,38 @@ define([
         if (type === 'display') {
             tooltipNode = html.tooltip();
             tooltipNode.setAttribute('title', data);
+
+            if (href) {
+                aNode = document.createElement('a');
+                aNode.className = 'table-link';
+                aNode.setAttribute('href', href);
+
+                aNode.appendChild(document.createTextNode(data));
+                tooltipNode.appendChild(aNode);
+            } else {
+                tooltipNode.appendChild(document.createTextNode(data));
+            }
+
+            rendered = tooltipNode.outerHTML;
+            // Remove the nodes.
+            if (aNode) {
+                aNode.remove();
+            }
+            tooltipNode.remove();
+        }
+
+        return rendered;
+    };
+	
+    gTablesUtils.renderKernelRelease = function(data, type, href) {
+        var aNode;
+        var rendered;
+        var tooltipNode;
+
+        rendered = data;
+        if (type === 'display') {
+            tooltipNode = html.tooltip();
+            tooltipNode.setAttribute('title', 'more info');
 
             if (href) {
                 aNode = document.createElement('a');

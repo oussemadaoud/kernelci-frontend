@@ -344,74 +344,19 @@ require([
         document.getElementById('body-title').appendChild(docFrag);
 
         // Lab.
-        docFrag = document.createDocumentFragment();
-        tooltipNode = docFrag.appendChild(html.tooltip());
-        str = 'Test reports for lab&nbsp';
-        str += lab;
-        tooltipNode.setAttribute('title', str);
-
-        aNode = tooltipNode.appendChild(document.createElement('a'));
-        str = '/test/all/lab/';
-        str += lab;
-        str += '/';
-        aNode.setAttribute('href', str);
-        aNode.appendChild(document.createTextNode(lab));
-        aNode.insertAdjacentHTML('beforeend', '&nbsp;');
-        aNode.appendChild(html.search());
-
-        html.replaceContent(document.getElementById('dd-lab-name'), docFrag);
+        html.replaceContent(
+            document.getElementById('dd-lab-name'),
+            document.createTextNode(lab));
 
         // Board.
-        docFrag = document.createDocumentFragment();
-        tooltipNode = docFrag.appendChild(html.tooltip());
-        str = 'Test reports for board&nbsp;';
-        str += board;
-        tooltipNode.setAttribute('title', str);
-
-        aNode = tooltipNode.appendChild(document.createElement('a'));
-        str = '/test/';
-        str += board;
-        str += '/';
-        aNode.setAttribute('href', str);
-        aNode.appendChild(document.createTextNode(board));
-        aNode.insertAdjacentHTML('beforeend', '&nbsp;');
-        aNode.appendChild(html.search());
-
         html.replaceContent(
-            document.getElementById('dd-suite-board'), docFrag);
+            document.getElementById('dd-suite-board'),
+            document.createTextNode(board));
 
         // Tree.
-        docFrag = document.createDocumentFragment();
-        spanNode = docFrag.appendChild(document.createElement('span'));
-
-        tooltipNode = spanNode.appendChild(html.tooltip());
-        str = 'Test reports for&nbsp;';
-        str += job;
-        tooltipNode.setAttribute('title', str);
-
-        aNode = tooltipNode.appendChild(document.createElement('a'));
-        str = '/test/all/job/';
-        str += job;
-        str += '/';
-        aNode.setAttribute('href', str);
-        aNode.appendChild(document.createTextNode(job));
-
-        spanNode.insertAdjacentHTML('beforeend', '&nbsp;&mdash;&nbsp;');
-
-        tooltipNode = spanNode.appendChild(html.tooltip());
-        str = 'Details for tree&nbsp;';
-        str += job;
-        tooltipNode.setAttribute('title', str);
-
-        aNode = tooltipNode.appendChild(document.createElement('a'));
-        str = '/job/';
-        str += job;
-        str += '/';
-        aNode.setAttribute('href', str);
-        aNode.insertAdjacentHTML('beforeend', '&nbsp;');
-        aNode.appendChild(html.tree());
-
-        html.replaceContent(document.getElementById('dd-suite-tree'), docFrag);
+        html.replaceContent(
+            document.getElementById('dd-suite-tree'),
+            document.createTextNode(job));
 
         // Branch.
         html.replaceContent(
@@ -419,88 +364,14 @@ require([
             document.createTextNode(branch));
 
         // Kernel.
-        docFrag = document.createDocumentFragment();
-        spanNode = docFrag.appendChild(document.createElement('span'));
-
-        tooltipNode = spanNode.appendChild(html.tooltip());
-        str = 'Test reports for&nbsp;';
-        str += job;
-        str += '&nbsp;&dash;&nbsp;';
-        str += kernel;
-        tooltipNode.setAttribute('title', str);
-
-        aNode = tooltipNode.appendChild(document.createElement('a'));
-        str = '/test/all/job/';
-        str += job;
-        str += '/branch/';
-        str += branch;
-        str += '/kernel/';
-        str += kernel;
-        str += '/';
-        aNode.setAttribute('href', str);
-        aNode.appendChild(document.createTextNode(kernel));
-
-        spanNode.insertAdjacentHTML('beforeend', '&nbsp;&mdash;&nbsp;');
-
-        tooltipNode = spanNode.appendChild(html.tooltip());
-        str = 'Build reports for&nbsp;';
-        str += job;
-        str += '&nbsp;&dash;&nbsp;';
-        str += kernel;
-        tooltipNode.setAttribute('title', str);
-
-        aNode = tooltipNode.appendChild(document.createElement('a'));
-        str = '/build/';
-        str += job;
-        str += '/branch/';
-        str += branch;
-        str += '/kernel/';
-        str += kernel;
-        str += '/';
-        aNode.setAttribute('href', str);
-        aNode.insertAdjacentHTML('beforeend', '&nbsp;');
-        aNode.appendChild(html.build());
-
         html.replaceContent(
-            document.getElementById('dd-suite-kernel'), docFrag);
-
+            document.getElementById('dd-suite-kernel'),
+            document.createTextNode(kernel));
+            
         // Defconfig
-        docFrag = document.createDocumentFragment();
-        spanNode = docFrag.appendChild(document.createElement('span'));
-        tooltipNode = spanNode.appendChild(html.tooltip());
-        tooltipNode.setAttribute('title', 'Test reports');
-
-        aNode = tooltipNode.appendChild(document.createElement('a'));
-        str = '/test/';
-        str += board;
-        str += '/job/';
-        str += job;
-        str += '/branch/';
-        str += branch;
-        str += '/kernel/';
-        str += kernel;
-        str += '/defconfig/';
-        str += defconfigFull;
-        str += '/';
-        aNode.setAttribute('href', str);
-        aNode.appendChild(document.createTextNode(defconfigFull));
-
-        if (result.build_id) {
-            spanNode.insertAdjacentHTML('beforeend', '&nbsp;&mdash;&nbsp;');
-
-            tooltipNode = spanNode.appendChild(html.tooltip());
-            tooltipNode.setAttribute('title', 'Build details');
-            aNode = tooltipNode.appendChild(document.createElement('a'));
-            str ='/build/id/';
-            str += result.build_id.$oid;
-            str += '/';
-            aNode.setAttribute('href', str);
-            aNode.insertAdjacentHTML('beforeend', '&nbsp;');
-            aNode.appendChild(html.build());
-        }
-
         html.replaceContent(
-            document.getElementById('dd-suite-defconfig'), docFrag);
+            document.getElementById('dd-suite-defconfig'),
+            document.createTextNode(defconfigFull));
 
         // Date.
         docFrag = document.createDocumentFragment();

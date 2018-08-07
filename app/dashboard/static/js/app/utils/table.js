@@ -76,7 +76,7 @@ define([
         _rowURLElements: ['job', 'kernel'],
         _clickFunction: null,
         _drawFunction: null,
-        _lengthMenu: [25, 50, 75, 100],
+        _lengthMenu: [100, 250, 500, 1000],
         _order: [1, 'desc'],
         _dom: gTableDom,
         _data: null,

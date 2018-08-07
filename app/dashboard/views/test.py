@@ -38,7 +38,7 @@ class TestGenericView(View):
 class TestsAllView(TestGenericView):
 
     def dispatch_request(self):
-        body_title = "Available Test Suite Reports"
+        body_title = "Tests by board Reports"
         search_filter, page_len = get_search_parameters(request)
 
         return render_template(

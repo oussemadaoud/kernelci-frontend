@@ -384,19 +384,37 @@ def init():
     )
 
     add_rule(
-        "/release/kernel/<string:kernel>/",
+        "/test-build/",
+        view_func=vrelease.ReleasesAllView.as_view("release-all-view"),
+        methods=["GET"]
+    )
+
+    add_rule(
+        "/test-build/kernel/<string:kernel>/",
         view_func=vrelease.ReleasesKernelView.as_view("release-kernel"),
         methods=["GET"]
     )
 
     add_rule(
-        "/release/kernel/<string:kernel>/board/<string:board>/",
+        "/test-build/kernel/<string:kernel>/board/<string:board>/",
         view_func=vrelease.ReleasesKernelBoardView.as_view("release-kernel-board"),
         methods=["GET"]
     )
-    
+
     add_rule(
-        "/release/",
-        view_func=vrelease.ReleasesAllView.as_view("release-all-view"),
+        "/test-build/kernel/<string:kernel>/board/<string:board>/suite_name/<string:suite_name>/",
+        view_func=vrelease.ReleasesKernelBoardSuiteNameView.as_view("release-kernel-board-suite-name"),
+        methods=["GET"]
+    )
+
+    add_rule(
+        "/test-build/kernel/<string:kernel>/board/<string:board>/suite_name/<string:suite_name>/set_name/<string:set_name>/",
+        view_func=vrelease.ReleasesKernelBoardSetNameView.as_view("release-kernel-board-set-name"),
+        methods=["GET"]
+    )
+
+    add_rule(
+        "/test-build/kernel/<string:kernel>/board/<string:board>/suite_name/<string:suite_name>/set_name/<string:set_name>/case_name/<string:case_name>/",
+        view_func=vrelease.ReleasesKernelBoardCaseNameView.as_view("release-kernel-board-case-name"),
         methods=["GET"]
     )

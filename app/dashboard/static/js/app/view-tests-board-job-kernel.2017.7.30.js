@@ -337,51 +337,14 @@ require([
             gitURLs = urls.translateCommit(gitURL, gitCommit);
 
             // SoC.
-            tooltipNode = html.tooltip();
-            tooltipNode.setAttribute('title', 'Details for SoC ' + gBoard);
-            aNode = document.createElement('a');
-            aNode.setAttribute('href', '/soc/' + gBoard + '/');
-            aNode.appendChild(document.createTextNode(gBoard));
-            tooltipNode.appendChild(aNode);
-
-            html.replaceContent(document.getElementById('board'), tooltipNode);
+            html.replaceContent(
+                document.getElementById('board'),
+                document.createTextNode(gBoard));
 
             // Tree.
-            domNode = document.createElement('div');
-            tooltipNode = html.tooltip();
-            tooltipNode.setAttribute(
-                'title',
-                'Details for SoC &#171;' + gBoard + '&#187; with tree ' + gJob);
-            aNode = document.createElement('a');
-            aNode.setAttribute('href', '/soc/' + gBoard + '/job/' + gJob + '/');
-            aNode.appendChild(document.createTextNode(gJob));
-            tooltipNode.appendChild(aNode);
-
-            domNode.appendChild(tooltipNode);
-            domNode.insertAdjacentHTML('beforeend', '&nbsp;&mdash;&nbsp;');
-
-            tooltipNode = html.tooltip();
-            tooltipNode.setAttribute(
-                'title', 'Boot reports for tree &#171;' + gJob + '&#187;');
-            aNode = document.createElement('a');
-            aNode.setAttribute('href', '/boot/all/job/' + gJob + '/');
-            aNode.appendChild(html.boot());
-            tooltipNode.appendChild(aNode);
-
-            domNode.appendChild(tooltipNode);
-            domNode.insertAdjacentHTML('beforeend', '&nbsp;&dash;&nbsp;');
-
-            tooltipNode = html.tooltip();
-            tooltipNode.setAttribute(
-                'title', 'Details for tree &#171;' + gJob + '&#187;');
-            aNode = document.createElement('a');
-            aNode.setAttribute('href', '/job/' + gJob + '/');
-            aNode.appendChild(html.tree());
-            tooltipNode.appendChild(aNode);
-
-            domNode.appendChild(tooltipNode);
-
-            html.replaceContent(document.getElementById('tree'), domNode);
+            html.replaceContent(
+                document.getElementById('tree'),
+                document.createTextNode(gJob));
 
             // Git branch.
             html.replaceContent(
@@ -389,38 +352,10 @@ require([
                 document.createTextNode(gitBranch));
 
             // Git describe.
-            domNode = document.createElement('div');
-            domNode.appendChild(document.createTextNode(gKernel));
-            domNode.insertAdjacentHTML('beforeend', '&nbsp;&mdash;&nbsp;');
-
-            tooltipNode = html.tooltip();
-            tooltipNode.setAttribute(
-                'title',
-                'Boot reports for &#171;' + gJob + '&#187; - ' + gKernel);
-            aNode = document.createElement('a');
-            aNode.setAttribute(
-                'href', '/boot/all/job/' + gJob + '/kernel/' + gKernel + '/');
-            aNode.appendChild(html.boot());
-            tooltipNode.appendChild(aNode);
-
-            domNode.appendChild(tooltipNode);
-            domNode.insertAdjacentHTML('beforeend', '&nbsp;&dash;&nbsp;');
-
-            tooltipNode = html.tooltip();
-            tooltipNode.setAttribute(
-                'title',
-                'Build reports for &#171;' + gJob + '&#187; - ' + gKernel);
-            aNode = document.createElement('a');
-            aNode.setAttribute(
-                'href', '/build/' + gJob + '/kernel/' + gKernel);
-            aNode.appendChild(html.build());
-            tooltipNode.appendChild(aNode);
-
-            domNode.appendChild(tooltipNode);
-
             html.replaceContent(
-                document.getElementById('git-describe'), domNode);
-
+                document.getElementById('git-describe'),
+                document.createTextNode(gKernel));
+                
             // Git URL.
             if (gitURLs[0]) {
                 aNode = document.createElement('a');
