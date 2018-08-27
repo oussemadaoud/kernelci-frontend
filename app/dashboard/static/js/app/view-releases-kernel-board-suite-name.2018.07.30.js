@@ -2,8 +2,8 @@
  * kernelci dashboard.
  * 
  * Copyright (C) 2014, 2015, 2016, 2017  Linaro Ltd.
- * Copyright (c) 2017 BayLibre, SAS.
- * Author: Loys Ollivier <lollivier@baylibre.com>
+ * Copyright (c) 2017, 2018 BayLibre, SAS.
+ * Author: Oussema Daoud <odaoud@baylibre.com>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -29,24 +29,19 @@ require([
     'utils/html',
     'utils/const',
     'tables/release'
-], function(
-    $,
-    init, router, format, error, request, table, html, appconst, trelease, ttest) {
+],
+function($, init, router, format, error, request, table, html, appconst, trelease, ttest) {
     'use strict';
-
     var page = 'test-build';
-
-    var [ gDateRange , gSearchFilter , gPageLen ] = init.init( page );
-
+    var mPage = 'release'; // for nav li class = active
+    var [ gDateRange , gSearchFilter , gPageLen ] = init.init( mPage );
     setTimeout(getDataSuite, 10);
-    // --------------------------------------------------------------------------
 
     // Parsing of parameters to url
     let params = ( new router( ) )
         .addRoute( page , page + '/$p' , { kernel : '[a-zA-Z0-9-_.]+' , board : '[a-zA-Z0-9-_.]+' , suite_name : '[a-zA-Z0-9-_.]+' } )
         .parse( )
-    ;
-    console.log( 'Params in URL ' , params )
+        ;
 
     // --------------------------------------------------------------------------
     var gTable = table({
@@ -59,28 +54,30 @@ require([
         .rowURLElements     (['test_set_name'])
 
     // --------------------------------------------------------------------------
-   
+
     function enableSearch(){
         gTable
             .pageLen(gPageLen)
             .search(gSearchFilter);
     }
     var warning = 40;
-	var success = 85;
-    //conver string to int
-	var hash = function(s) {
-		var a = 1, c = 0, h, o;
-		if (s) {
-			a = 0;
-			for (h = s.length - 1; h >= 0; h--) {
-				o = s.charCodeAt(h);
-				a = (a<<6&268435455) + o + (o<<14);
-				c = a & 266338304;
-				a = c!==0?a^c>>21:a;
-			}
-		}
-		return String(a);
+    var success = 85;
+    
+    //hash int format
+    var hash = function(s) {
+        var a = 1, c = 0, h, o;
+        if (s) {
+            a = 0;
+            for (h = s.length - 1; h >= 0; h--) {
+                o = s.charCodeAt(h);
+                a = (a<<6&268435455) + o + (o<<14);
+                c = a & 266338304;
+                a = c!==0?a^c>>21:a;
+            }
+        }
+        return String(a);
 	}
+
     function updateOrStageCount(elementId, count) {
         var element;
         element = document.getElementById(elementId);
@@ -88,7 +85,7 @@ require([
         // yet to add it.
         if(element){
             html.replaceContent(element, document.createTextNode(format.number(count)));
-        }else{
+        }else {
             html.replaceContent(element, document.createTextNode('?'));
         }
     }
@@ -101,7 +98,6 @@ require([
             html.replaceContent(element, document.createTextNode(format.number('?')));
         }
     }
-    // Render Details
     function _renderCasesCount(name, type , data){
         return trelease.renderCasesCount(hash(data.test_set_name), type, ''/* , 'board/'+data.board+'/suite/name/'+name */);
     }
@@ -111,7 +107,8 @@ require([
     function _renderDetails(href, type, data) {
         return trelease.renderDetails('/test-build/kernel/'+params.kernel+'/board/'+params.board+'/suite_name/'+params.suite_name+'/set_name/'+data.test_set_name+'/', type, 'Details for '+data.test_set_name+' test set name');
     }
-    function initColumns(){
+    
+    function initColumns() {
         return [
             {
                 data   : 'test_set_name',
@@ -122,26 +119,31 @@ require([
                 data   : 'test_set_name',
                 title  : 'Test Case Count',
                 type   : 'string',
+                searchable : false,
+				orderable  : false,
                 render: _renderCasesCount
             },
             {
-				data: 'test_set_name',
-				title: 'Rate',
-				type: 'string',
-				className: 'date-column pull-center',
-				render: _renderRate
-			},
-			{
-				data: 'test_set_name',
+                data: 'test_set_name',
+                title: 'Rate',
+                type: 'string',
+                className: 'date-column pull-center',
+                searchable : false,
+				orderable  : false,
+                render: _renderRate
+            },
+            {
+                data: 'test_set_name',
                 title: 'Details',
-				type: 'string',
-				orderable: false,
-				searchable: false,
-				className: 'select-column pull-center',
-				render: _renderDetails //_renderMoreInfo
-			}
+                type: 'string',
+                orderable: false,
+                searchable: false,
+                className: 'select-column pull-center',
+                render: _renderDetails
+            }
         ];
     }
+
     //updateDetails header
     function updateDetails(response) {
         var aNode,
@@ -154,21 +156,17 @@ require([
             gitUrl,
             results,
             tooltipNode;
-        console.log('updateDetails');
-        console.log(response);
         results = response.result;
         if (results.length === 0) {
             html.replaceByClassTxt('loading-content', '?');
         } else {
             results = results[0];
-
             gitBranch = results.git_branch;
             gitCommit = results.git_commit;
             gitDescribe = results.git_describe;
             gitUrl = results.git_url;
             job=results.job;
             createdOn = new Date(results.created_on.$date);
-
             // SoC.
             tooltipNode = html.tooltip();
             tooltipNode.setAttribute('title', 'Details for SoC ' + params.board);
@@ -176,25 +174,24 @@ require([
             aNode.setAttribute('href', '/soc/' + params.board + '/');
             aNode.appendChild(document.createTextNode(params.board));
             tooltipNode.appendChild(aNode);
-
             html.replaceContent(document.getElementById('board'), tooltipNode);
-
             // Tree.
             html.replaceContent(
                 document.getElementById('tree'),
-                document.createTextNode(job));
-
+                document.createTextNode(job)
+            );
             // Git branch.
             html.replaceContent(
                 document.getElementById('git-branch'),
-                document.createTextNode(gitBranch));
-
+                document.createTextNode(gitBranch)
+            );
             // Git describe.
             domNode = document.createElement('div');
             domNode.appendChild(document.createTextNode(params.kernel));
             html.replaceContent(
-                document.getElementById('git-describe'), domNode);
-
+                document.getElementById('git-describe'),
+                domNode
+            );
             // Git URL.
             if (gitUrl) {
                 aNode = document.createElement('a');
@@ -210,7 +207,6 @@ require([
                 }
             }
             html.replaceContent(document.getElementById('git-url'), aNode);
-
             // Git commit.
             if (gitCommit) {
                 aNode = document.createElement('a');
@@ -226,69 +222,68 @@ require([
                 }
             }
             html.replaceContent(document.getElementById('git-commit'), aNode);
-
             // Date.
             domNode = document.createElement('time');
             domNode.setAttribute('datetime', createdOn.toISOString());
             domNode.appendChild(
-                document.createTextNode(createdOn.toCustomISODate()));
+                document.createTextNode(createdOn.toCustomISODate())
+            );
             html.replaceContent(
-                document.getElementById('job-date'), domNode);
+                document.getElementById('job-date'), 
+                domNode
+            );
         }
     }
-    // --------------------------------------------------------------------------
-	//Get test_case list
+    //Get test_case list
     function getDataCase(data){
-		console.log('test_suit_data');
-        console.log(data);
         //Set header
         updateDetails(data);
         let param  = {
             kernel: params.kernel,
-			board: params.board,
-			field: 'kernel',
+            board: params.board,
+            field: 'kernel',
             field: 'board'
         };
         var batchOpsset = [];
-		batchOpsset.push({
-			method: 'GET',
-			operation_id: 'getallSet',
-			resource: 'test_set',
-			query: 'field=_id&field=name&field=test_case'
-		});
-		var deferred = request.post( '/_backend/batch', JSON.stringify( { batch: batchOpsset } ) );
-		$.when(deferred)
-			.fail(table.loadingError)
-			.done(function(allSet){
-				// *****************************************************
-				// create batchOps *************************************
-				// to optimize *****************************************
-				// add more filter (too much data for this batch)*******
-				var batchOps = [];
-				batchOps.push({
-					method: 'GET',
-					operation_id: 'getallCases',
-					resource: 'test_case',
-					query: 'field=status&field=test_set_id'
-				});
-				// *****************************************************
-				var deferred = request.post( '/_backend/batch', JSON.stringify( { batch: batchOps } ) );
-				$.when(deferred)
-					.fail(table.loadingError)
-					.done(function(allCases){
-						var store = [];
+        batchOpsset.push({
+            method: 'GET',
+            operation_id: 'getallSet',
+            resource: 'test_set',
+            query: 'field=_id&field=name&field=test_case'
+        });
+        var deferred = request.post( '/_backend/batch', JSON.stringify( { batch: batchOpsset } ) );
+        $.when(deferred)
+            .fail(table.loadingError)
+            .done(function(allSet){
+                // *****************************************************
+                // create batchOps *************************************
+                // to optimize *****************************************
+                // add more filter (too much data for this batch)*******
+                var batchOps = [];
+                batchOps.push({
+                    method: 'GET',
+                    operation_id: 'getallCases',
+                    resource: 'test_case',
+                    query: 'field=status&field=test_set_id'
+                });
+                // *****************************************************
+                var deferred = request.post( '/_backend/batch', JSON.stringify( { batch: batchOps } ) );
+                $.when(deferred)
+                    .fail(table.loadingError)
+                    .done(function(allCases){
+                        var store = [];
                         var UniqueSetName = [];
                         var caseCount = [];
-						data.result.forEach(function(element){//forEach data****************************
-							element.test_case.forEach(function(e){
-								allCases.result[0].result[0].result.forEach(function(caseID){//forEach allCases****************
-									if(caseID._id.$oid==e.$oid){
-										//get set_name 
+                        data.result.forEach(function(element){
+                            element.test_case.forEach(function(e){
+                                allCases.result[0].result[0].result.forEach(function(caseID){
+                                    if(caseID._id.$oid==e.$oid){
+                                        //get set_name 
                                         var passCount=0;
                                         var failCount=0;
                                         var skipCount=0;
                                         var totalCount=0;
-										allSet.result[0].result[0].result.forEach(function(setID){//forEach allSet***********************
+                                        allSet.result[0].result[0].result.forEach(function(setID){
                                             setID.test_case.forEach(function(setcaseID){
                                                 if(setcaseID.$oid == e.$oid){
                                                     if(!UniqueSetName.includes(setID.name)){
@@ -301,10 +296,6 @@ require([
                                                         store.push({
                                                             test_set_name: setID.name,
                                                             test_case_name: caseID.name
-                                                            // totalCount: totalCount,
-                                                            // passCount: passCount,
-                                                            // failCount: failCount,
-                                                            // skipCount: skipCount
                                                         });
                                                     }
                                                     //gat status
@@ -315,18 +306,15 @@ require([
                                                     if(caseID.status == 'PASS'){
                                                         caseCount[setID.name+'-passCount']++;
                                                     }
-                                                    caseCount[setID.name+'-skipCount']=caseCount[setID.name+'-totalCount']-caseCount[setID.name+'-passCount']-caseCount[setID.name+'-failCount'];
+                                                    caseCount[setID.name+'-skipCount'] = caseCount[setID.name+'-totalCount']-caseCount[setID.name+'-passCount']-caseCount[setID.name+'-failCount'];
                                                 }
-                                            });
-                                            
-										});
-									}
-								});
-							});
-						});
-						console.log('caseCount');
-						console.log(caseCount);
-						getDataDone(store);
+                                            });  
+                                        });
+                                    }
+                                });
+                            });
+                        });
+                        getDataDone(store);
                         UniqueSetName.forEach(function(setName){
                             var idCountCases = hash(setName);
                             var totalCount = caseCount[setName+'-totalCount'];
@@ -354,26 +342,23 @@ require([
                                 else
                                     gTable.addDrawEvent($('#rate-'+idCountCases).parent().parent().addClass( " alert-danger" ));
                             }
-                            //gTable.rowURL( '/'+ page + '/kernel/'+ params.kernel +'/board/'+ params.board+'/suite_name/'+params.suite_name+'/set_name/'+setName+'/')
-
                         });
-                        //setCount
-					});
-			});
+                    });
+            });
     }
     
-	//Get test_suite list
+    //Get test_suite list
     function getDataSuite(){
         var page_header =  '<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7"><dl class="dl-horizontal"><dt>Kernel/Version</dt><dd>'+params.kernel+'</dd><dt>Board</dt><dd>'+params.board+'</dd><dt>Test suite name</dt><dd>'+params.suite_name+'</dd><dt>Tree/Job</dt><dd class="loading-content" id="tree"></dd><dt>Git branch</dt><dd class="loading-content" id="git-branch"></dd><dt>Git describe</dt><dd class="loading-content" id="git-describe"></dd><dt>Git URL</dt><dd class="loading-content" id="git-url"></dd><dt>Git commit</dt><dd class="loading-content" id="git-commit"></dd><dt>Date</dt><dd class="loading-content" id="job-date"></dd></dl></div>';
         $(".page-header").parent().html($(".page-header").parent().html() + '<br>' + page_header);
         let param  = {
             kernel: params.kernel,
-			board: params.board,
+            board: params.board,
             name: params.suite_name
         };
         request.api(
-            'tests/suites/' ,
-            param ,
+            'tests/suites/',
+            param,
             getDataCase,
             table.loadingError
         );
@@ -382,12 +367,10 @@ require([
      * @param store
      */
     function getDataDone(store) {
-		console.log('getDataDone->store');
-		console.log(store);
-		gTable
-			.data(store)
-			.columns(initColumns())
-			.draw()
-		;
+        gTable
+            .data(store)
+            .columns(initColumns())
+            .draw()
+            ;
     }
 });
