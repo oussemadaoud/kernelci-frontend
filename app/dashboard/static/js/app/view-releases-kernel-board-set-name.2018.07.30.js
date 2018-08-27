@@ -2,8 +2,8 @@
  * kernelci dashboard.
  * 
  * Copyright (C) 2014, 2015, 2016, 2017  Linaro Ltd.
- * Copyright (c) 2017 BayLibre, SAS.
- * Author: Loys Ollivier <lollivier@baylibre.com>
+ * Copyright (c) 2017, 2018 BayLibre, SAS.
+ * Author: Oussema Daoud <odaoud@baylibre.com>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -29,37 +29,28 @@ require([
     'utils/html',
     'utils/const',
     'tables/release'
-], function(
-    $,
-    init, router, format, error, request, table, html, appconst, trelease) {
+],
+function($, init, router, format, error, request, table, html, appconst, trelease) {
     'use strict';
-
     var page = 'test-build';
-
-    var [ gDateRange , gSearchFilter , gPageLen ] = init.init( page );
-
+    var mPage = 'release'; // for nav li class = active
+    var [ gDateRange , gSearchFilter , gPageLen ] = init.init( mPage );
     setTimeout(getDataSuite, 10);
-    // --------------------------------------------------------------------------
 
     // Parsing of parameters to url
     let params = ( new router( ) )
         .addRoute( page , page + '/$p' , { kernel : '[a-zA-Z0-9-_.]+' , board : '[a-zA-Z0-9-_.]+' , suite_name : '[a-zA-Z0-9-_.]+' , set_name : '[a-zA-Z0-9-_.]+' } )
         .parse( )
-    ;
-    console.log( 'Params in URL ' , params );
+        ;
     var logpath; 
     var boot_log_html;
-    // --------------------------------------------------------------------------
     var gTable = table({
         tableId           : 'release-table',
         tableDivId        : 'table-div',
         tableLoadingDivId : 'table-loading'
-    }).order              ([0, 'asc'])
-        .languageLengthMenu ('Test case per page')
-        //.rowURL             ( '/'+ page + '/kernel/'+ params.kernel +'/board/'+ params.board )
-        //.rowURLElements     (['kernel' , 'board'])
-
-    // --------------------------------------------------------------------------
+    })
+    .order([0, 'asc'])
+    .languageLengthMenu('Test case per page')
    
     function enableSearch(){
         gTable
@@ -79,38 +70,38 @@ require([
                 title  : 'Test Case ID',
                 type   : 'string'
             },
-			{
-            
+            {
                 data   : 'status',
                 title  : 'Status',
-				className: 'pull-center',
+                className: 'pull-center',
                 type   : 'string'
             },
             {
                 data   : 'measured',
                 title  : 'Measured',
-				className: 'pull-center',
+                className: 'pull-center',
                 type   : 'string'
             },
             {
                 data   : 'units',
                 title  : 'Units',
-				className: 'pull-center',
+                className: 'pull-center',
                 type   : 'string'
             },
             {
-				data       : 'test_case_name',
-				title      : 'Log',
-				type       : 'string',
-				searchable : false,
-				orderable  : false,
-				className  : 'select-column pull-center',
-				render     : ( data, type ) => {
-					return trelease.renderDetails('null', type, '- Log file - ');
-				}
-			}
+                data       : 'test_case_name',
+                title      : 'Log',
+                type       : 'string',
+                searchable : false,
+                orderable  : false,
+                className  : 'select-column pull-center',
+                render     : ( data, type ) => {
+                    return trelease.renderDetails('null', type, '- Log file - ');
+                }
+            }
         ];
     }
+
     //updateDetails header
     function updateDetails(response) {
         var aNode,
@@ -123,21 +114,17 @@ require([
             gitUrl,
             results,
             tooltipNode;
-        console.log('updateDetails');
-        console.log(response);
         results = response.result;
         if (results.length === 0) {
             html.replaceByClassTxt('loading-content', '?');
         } else {
             results = results[0];
-
             gitBranch = results.git_branch;
             gitCommit = results.git_commit;
             gitDescribe = results.git_describe;
             gitUrl = results.git_url;
             job=results.job;
             createdOn = new Date(results.created_on.$date);
-
             // SoC.
             tooltipNode = html.tooltip();
             tooltipNode.setAttribute('title', 'Details for SoC ' + params.board);
@@ -145,25 +132,24 @@ require([
             aNode.setAttribute('href', '/soc/' + params.board + '/');
             aNode.appendChild(document.createTextNode(params.board));
             tooltipNode.appendChild(aNode);
-
             html.replaceContent(document.getElementById('board'), tooltipNode);
-
             // Tree.
             html.replaceContent(
                 document.getElementById('tree'),
-                document.createTextNode(job));
-
+                document.createTextNode(job)
+            );
             // Git branch.
             html.replaceContent(
                 document.getElementById('git-branch'),
-                document.createTextNode(gitBranch));
-
+                document.createTextNode(gitBranch)
+            );
             // Git describe.
             domNode = document.createElement('div');
             domNode.appendChild(document.createTextNode(params.kernel));
             html.replaceContent(
-                document.getElementById('git-describe'), domNode);
-
+                document.getElementById('git-describe'),
+                domNode
+            );
             // Git URL.
             if (gitUrl) {
                 aNode = document.createElement('a');
@@ -179,7 +165,6 @@ require([
                 }
             }
             html.replaceContent(document.getElementById('git-url'), aNode);
-
             // Git commit.
             if (gitCommit) {
                 aNode = document.createElement('a');
@@ -195,110 +180,118 @@ require([
                 }
             }
             html.replaceContent(document.getElementById('git-commit'), aNode);
-
             // Date.
             domNode = document.createElement('time');
             domNode.setAttribute('datetime', createdOn.toISOString());
             domNode.appendChild(
-                document.createTextNode(createdOn.toCustomISODate()));
+                document.createTextNode(createdOn.toCustomISODate())
+            );
             html.replaceContent(
-                document.getElementById('job-date'), domNode);
+                document.getElementById('job-date'),
+                domNode
+            );
         }
     }
-    // --------------------------------------------------------------------------
-	//Get test_case list
+
+    //Get test_case list
     function getDataCase(data){
-		console.log('test_suit_data');
-        console.log(data);
         boot_log_html = data.result[0].boot_log_html;
         logpath = '/test/suite/'+data.result[0]._id.$oid+'/'+data.result[0].job+'/'+data.result[0].git_branch+'/'+data.result[0].kernel+'/'+data.result[0].arch+'/'+data.result[0].defconfig_full+'/'+data.result[0].lab_name+'/'+data.result[0].boot_log_html;
         //Set header
         updateDetails(data);
         let param  = {
             kernel: params.kernel,
-			board: params.board,
-			field: 'kernel',
+            board: params.board,
+            field: 'kernel',
             field: 'board'
         };
         var batchOpsset = [];
-		batchOpsset.push({
-			method: 'GET',
-			operation_id: 'getallSet',
-			resource: 'test_set',
-			query: 'field=_id&field=name&field=test_case'
-		});
-		var deferred = request.post( '/_backend/batch', JSON.stringify( { batch: batchOpsset } ) );
-		$.when(deferred)
-			.fail(table.loadingError)
-			.done(function(allSet){
-				// *****************************************************
-				// create batchOps *************************************
-				// to optimize *****************************************
-				// add more filter (too much data for this batch)*******
-				var batchOps = [];
-				batchOps.push({
-					method: 'GET',
-					operation_id: 'getallCases',
-					resource: 'test_case',
-					query: 'field=status&field=name&field=measurements'
-				});
-				// *****************************************************
-				var deferred = request.post( '/_backend/batch', JSON.stringify( { batch: batchOps } ) );
-				$.when(deferred)
-					.fail(table.loadingError)
-					.done(function(allCases){
-						var store = [];
-						data.result.forEach(function(element){
-							element.test_case.forEach(function(e){
-								allCases.result[0].result[0].result.forEach(function(caseID){
-									if(caseID._id.$oid==e.$oid){
-										//gat status
-										if(caseID.status == 'FAIL'){
-											var sta='<span rel="tooltip" data-toggle="tooltip" title="'+caseID.status+'"><span class="label label-danger label-status"><i class="fa fa-exclamation-triangle"></i></span></span>';
-										}else{ 
-											if(caseID.status == 'PASS')var sta='<span rel="tooltip" data-toggle="tooltip" title="'+caseID.status+'"><span class="label label-success label-status"><i class="fa fa-check"></i></span></span>';
-											else var sta='<span rel="tooltip" data-toggle="tooltip" title="'+caseID.status+'"><span class="label label-warning label-status"><i class="fa fa-exclamation-triangle"></i></span></span>';
-										}
-										//get set_name 
-										allSet.result[0].result[0].result.forEach(function(setID){
-											setID.test_case.forEach(function(setcaseID){
-												if(setcaseID.$oid == e.$oid){
+        batchOpsset.push({
+            method: 'GET',
+            operation_id: 'getallSet',
+            resource: 'test_set',
+            query: 'field=_id&field=name&field=test_case'
+        });
+        var deferred = request.post( '/_backend/batch', JSON.stringify( { batch: batchOpsset } ) );
+        $.when(deferred)
+            .fail(table.loadingError)
+            .done(function(allSet){
+                // *****************************************************
+                // create batchOps *************************************
+                // to optimize *****************************************
+                // add more filter (too much data for this batch)*******
+                var batchOps = [];
+                batchOps.push({
+                    method: 'GET',
+                    operation_id: 'getallCases',
+                    resource: 'test_case',
+                    query: 'field=status&field=name&field=measurements'
+                });
+                // *****************************************************
+                var deferred = request.post( '/_backend/batch', JSON.stringify( { batch: batchOps } ) );
+                $.when(deferred)
+                    .fail(table.loadingError)
+                    .done(function(allCases){
+                        var store = [];
+                        data.result.forEach(function(element){
+                            element.test_case.forEach(function(e){
+                                allCases.result[0].result[0].result.forEach(function(caseID){
+                                    if(caseID._id.$oid==e.$oid){
+                                        //gat status
+                                        if(caseID.status == 'FAIL'){
+                                            var sta='<span rel="tooltip" data-toggle="tooltip" title="'+caseID.status+'"><span class="label label-danger label-status"><i class="fa fa-exclamation-triangle"></i></span></span>';
+                                        }else { 
+                                            if(caseID.status == 'PASS')
+                                                var sta='<span rel="tooltip" data-toggle="tooltip" title="'+caseID.status+'"><span class="label label-success label-status"><i class="fa fa-check"></i></span></span>';
+                                            else
+                                                var sta='<span rel="tooltip" data-toggle="tooltip" title="'+caseID.status+'"><span class="label label-warning label-status"><i class="fa fa-exclamation-triangle"></i></span></span>';
+                                        }
+                                        //get set_name 
+                                        allSet.result[0].result[0].result.forEach(function(setID){
+                                            setID.test_case.forEach(function(setcaseID){
+                                                if(setcaseID.$oid == e.$oid){
                                                     if(setID.name == params.set_name)
-													store.push({
-														//test_suite_name: element.name,
-														//test_set_name: setID.name,
-														test_case_name: caseID.name,
-                                                        test_case_id: caseID._id.$oid,
-														status: sta,
-														measured: function(){if(!caseID.measurements['value']) return '&empty;';else return caseID.measurements['value']},
-														units: function(){if(!caseID.measurements['value']) return ' ';else return caseID.measurements['unit']}
-													});
-												}
-											});
-										});
-									}
-								});
-							});
-						});
-						// console.log('store');
-						// console.log(store);
-						getDataDone(store);
-					});
-			});
+                                                        store.push({
+                                                            test_case_name: caseID.name,
+                                                            test_case_id: caseID._id.$oid,
+                                                            status: sta,
+                                                            measured: function() {
+                                                                if(!caseID.measurements['value'])
+                                                                    return '&empty;';
+                                                                else
+                                                                    return caseID.measurements['value']
+                                                            },
+                                                            units: function(){
+                                                                if(!caseID.measurements['value'])
+                                                                    return ' ';
+                                                                else
+                                                                    return caseID.measurements['unit']
+                                                            }
+                                                        });
+                                                }
+                                            });
+                                        });
+                                    }
+                                });
+                            });
+                        });
+                        getDataDone(store);
+                    });
+            });
     }
-    
-	//Get test_suite list
+
+    //Get test_suite list
     function getDataSuite(){
         var page_header =  '<div class="col-xs-12 col-sm-12 col-md-7 col-lg-7"><dl class="dl-horizontal"><dt>Kernel/Version</dt><dd>'+params.kernel+'</dd><dt>Board</dt><dd>'+params.board+'</dd><dt>Test suite name</dt><dd>'+params.suite_name+'</dd><dt>Test set name</dt><dd>'+params.set_name+'</dd><dt>Tree/Job</dt><dd class="loading-content" id="tree"></dd><dt>Git branch</dt><dd class="loading-content" id="git-branch"></dd><dt>Git describe</dt><dd class="loading-content" id="git-describe"></dd><dt>Git URL</dt><dd class="loading-content" id="git-url"></dd><dt>Git commit</dt><dd class="loading-content" id="git-commit"></dd><dt>Date</dt><dd class="loading-content" id="job-date"></dd></dl></div>';
         $(".page-header").parent().html($(".page-header").parent().html() + '<br>' + page_header);
         let param  = {
             kernel: params.kernel,
-			board: params.board,
+            board: params.board,
             name: params.suite_name
         };
         request.api(
-            'tests/suites/' ,
-            param ,
+            'tests/suites/',
+            param,
             getDataCase,
             table.loadingError
         );
@@ -312,9 +305,8 @@ require([
 		gTable
 			.data(store)
 			.columns(initColumns())
-            .rowURL             ( logpath )
-            //.rowURLElements     (['kernel' , 'board'])
+            .rowURL( logpath )
 			.draw()
-		;
+            ;
     }
 });
