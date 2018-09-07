@@ -86,7 +86,8 @@ require.config({
             'app/view-releases-all': 'app/view-releases-all.2018.07.30',
             'app/view-releases-kernel': 'app/view-releases-kernel.2018.07.30',
             'app/view-releases-kernel-board': 'app/view-releases-kernel-board.2018.07.30',
-            'app/view-releases-kernel-board-suite-name': 'app/view-releases-kernel-board-suite-name.2018.07.30'
+            'app/view-releases-kernel-board-suite-name': 'app/view-releases-kernel-board-suite-name.2018.07.30',
+            'app/view-releases-kernel-board-set-name': 'app/view-releases-kernel-board-set-name.2018.07.30'
         }
     },
     shim: {
