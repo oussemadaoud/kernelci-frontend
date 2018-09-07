@@ -84,7 +84,8 @@ require.config({
             'app/view-tests-board-job-kernel': 'app/view-tests-board-job-kernel.2017.12',
             'app/view-tests-suite-id': 'app/view-tests-suite-id.2018.2',
             'app/view-releases-all': 'app/view-releases-all.2018.07.30',
-            'app/view-releases-kernel': 'app/view-releases-kernel.2018.07.30'
+            'app/view-releases-kernel': 'app/view-releases-kernel.2018.07.30',
+            'app/view-releases-kernel-board': 'app/view-releases-kernel-board.2018.07.30'
         }
     },
     shim: {
