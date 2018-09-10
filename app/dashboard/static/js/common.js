@@ -83,11 +83,11 @@ require.config({
             'app/view-tests-board-job': 'app/view-tests-board-job.2017.12',
             'app/view-tests-board-job-kernel': 'app/view-tests-board-job-kernel.2017.12',
             'app/view-tests-suite-id': 'app/view-tests-suite-id.2018.2',
-            'app/view-releases-all': 'app/view-releases-all.2018.07.30',
-            'app/view-releases-kernel': 'app/view-releases-kernel.2018.07.30',
-            'app/view-releases-kernel-board': 'app/view-releases-kernel-board.2018.07.30',
-            'app/view-releases-kernel-board-suite-name': 'app/view-releases-kernel-board-suite-name.2018.07.30',
-            'app/view-releases-kernel-board-set-name': 'app/view-releases-kernel-board-set-name.2018.07.30'
+            'app/view-releases-all': 'app/view-releases-all.2018.09.10',
+            'app/view-releases-kernel': 'app/view-releases-kernel.2018.09.10',
+            'app/view-releases-kernel-board': 'app/view-releases-kernel-board.2018.09.10',
+            'app/view-releases-kernel-board-suite-name': 'app/view-releases-kernel-board-suite-name.2018.09.10',
+            'app/view-releases-kernel-board-set-name': 'app/view-releases-kernel-board-set-name.2018.09.10'
         }
     },
     shim: {
